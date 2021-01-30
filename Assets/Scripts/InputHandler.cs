@@ -15,6 +15,7 @@ namespace BL767.DS3
         public float mouseY;
 
         private PlayerControls inputActions;
+        private CameraHandler cameraHandler;
 
         private Vector2 movementInput;
         private Vector2 cameraInput;
@@ -22,6 +23,11 @@ namespace BL767.DS3
         #endregion Variables
 
         #region MonoBehaviour Callbacks
+
+        private void Awake()
+        {
+            cameraHandler = CameraHandler.singleton;
+        }
 
         private void OnEnable()
         {
@@ -39,6 +45,17 @@ namespace BL767.DS3
         private void OnDisable()
         {
             inputActions.Disable();
+        }
+
+        private void FixedUpdate()
+        {
+            float delta = Time.fixedDeltaTime;
+
+            if (cameraHandler != null)
+            {
+                cameraHandler.FollowTarget(delta);
+                cameraHandler.HandleCameraRotation(delta, mouseX, mouseY);
+            }
         }
 
         #endregion MonoBehaviour Callbacks

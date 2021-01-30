@@ -48,11 +48,15 @@ namespace BL767.DS3
         private void Update()
         {
             float t_delta = Time.deltaTime;
-            // 更新输入
+            // 更新输入，包括鼠标，键盘
             inputHandler.TickInput(t_delta);
             moveDirection = cameraObject.forward * inputHandler.vertical;
             moveDirection += cameraObject.right * inputHandler.horizontal;
             moveDirection.Normalize();
+            // 因为moveDirection是随着cameraobject变换的，当鼠标输入时，cameraObject是会上下移动的，
+            // 所以需要在这里将moveDirection的y轴矢量置为0
+            moveDirection.y = 0;
+
             // 将速度加入到move
             float t_speed = movementSpeed;
             moveDirection *= t_speed;
@@ -77,7 +81,7 @@ namespace BL767.DS3
         /// <summary>
         /// 处理人物旋转
         /// </summary>
-        /// <param name="p_delta">插值的过渡事件参数</param>
+        /// <param name="p_delta">插值的过渡时间参数</param>
         private void HandleRotation(float p_delta)
         {
             // 初始化目标方向
@@ -90,6 +94,7 @@ namespace BL767.DS3
             // 归一化，并将y轴矢量置为0
             t_targetDir.Normalize();
             t_targetDir.y = 0;
+
             // 如果没有位移，则将方向置为前方
             if (t_targetDir == Vector3.zero) t_targetDir = myTransform.forward;
 
