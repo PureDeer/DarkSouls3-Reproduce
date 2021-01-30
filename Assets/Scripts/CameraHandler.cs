@@ -40,6 +40,12 @@ namespace BL767.DS3
         [Tooltip("相机向下可旋转的最大角度")]
         public float maxPivot = 35;
 
+        [Tooltip("将相机假设为一个球体，设置它的半径，为碰撞做准备")]
+        public float cameraSphereRadius = 0.2f;
+
+        public float cameraCollisionOffset = 0.2f;
+        public float minimumCollisionOffset = 0.2f;
+
         #endregion Variables
 
         #region MonoBehaviours Callbacks
@@ -49,7 +55,9 @@ namespace BL767.DS3
             // using Singleton Design Pattern
             if (singleton == null) singleton = this;
             myTransform = transform;
+            // 实际上这个是相机离人物的水平距离
             defaultPos = cameraTransform.localPosition.z;
+            //
             ignoreLayers = ~(1 << 8 | 1 << 9 | 1 << 10);
         }
 
@@ -60,9 +68,14 @@ namespace BL767.DS3
         public void FollowTarget(float delta)
         {
             // targetTransform相当于玩家，让相机跟随玩家
-            Vector3 targetPos =
-                Vector3.SmoothDamp(myTransform.position, targetTransform.position, ref cameraFollowVelocity, delta / followSpeed);
+            Vector3 targetPos = Vector3.SmoothDamp(
+                myTransform.position,
+                targetTransform.position,
+                ref cameraFollowVelocity,
+                delta / followSpeed);
             myTransform.position = targetPos;
+
+            HandleCameraCollision(delta);
         }
 
         /// <summary>
@@ -91,5 +104,37 @@ namespace BL767.DS3
         }
 
         #endregion Public Methods
+
+        #region Private Methods
+
+        private void HandleCameraCollision(float delta)
+        {
+            targetPos = defaultPos;
+            Vector3 dir = cameraTransform.position - cameraPivotTransform.position;
+            dir.Normalize();
+            // 射线检测
+            bool isDetected = Physics.SphereCast(cameraPivotTransform.position,
+                                                cameraSphereRadius,
+                                                dir,
+                                                out RaycastHit hit,
+                                                Mathf.Abs(targetPos),
+                                                ignoreLayers);
+            // 如果像机碰撞，那么相机离人物距离将减少
+            if (isDetected)
+            {
+                float distance = Vector3.Distance(cameraPivotTransform.position, hit.point);
+                targetPos = -(distance - cameraCollisionOffset);
+            }
+            // 碰撞达到最小允许拉近距离
+            if (Mathf.Abs(targetPos) < minimumCollisionOffset)
+            {
+                targetPos = -minimumCollisionOffset;
+            }
+            // 插值，让摄像机碰撞时更新距离
+            cameraTransformPos.z = Mathf.Lerp(cameraTransform.localPosition.z, targetPos, delta / 0.2f);
+            cameraTransform.localPosition = cameraTransformPos;
+        }
+
+        #endregion Private Methods
     }
 }
