@@ -47,13 +47,13 @@ namespace BL767.DS3
 
         private void Update()
         {
-            float t_delta = Time.deltaTime;
+            float delta = Time.deltaTime;
             // 更新输入，包括鼠标，键盘
-            inputHandler.TickInput(t_delta);
+            inputHandler.TickInput(delta);
             moveDirection = cameraObject.forward * inputHandler.vertical;
             moveDirection += cameraObject.right * inputHandler.horizontal;
             moveDirection.Normalize();
-            // 因为moveDirection是随着cameraobject变换的，当鼠标输入时，cameraObject是会上下移动的，
+            // 因为moveDirection是随着cameraObject变换的，当鼠标输入时，cameraObject是会上下移动的，
             // 所以需要在这里将moveDirection的y轴矢量置为0
             moveDirection.y = 0;
 
@@ -62,13 +62,13 @@ namespace BL767.DS3
             moveDirection *= t_speed;
             // moveDirection会随着输入一直更新，所以会一直把moveDirection投射到plane上
             // 再将投射后的矢量赋给刚体的速度，即达成move
-            Vector3 t_projectedVelocity = Vector3.ProjectOnPlane(moveDirection, normalVector);
-            rigidbody.velocity = t_projectedVelocity;
+            Vector3 projectedVelocity = Vector3.ProjectOnPlane(moveDirection, normalVector);
+            rigidbody.velocity = projectedVelocity;
 
             animationHandler.UpdateAnimatorValues(inputHandler.moveAmount, 0);
 
             // 旋转
-            if (animationHandler.canRotate) HandleRotation(t_delta);
+            if (animationHandler.canRotate) HandleRotation(delta);
         }
 
         #endregion MonoBehaviour Callbacks
@@ -81,28 +81,28 @@ namespace BL767.DS3
         /// <summary>
         /// 处理人物旋转
         /// </summary>
-        /// <param name="p_delta">插值的过渡时间参数</param>
-        private void HandleRotation(float p_delta)
+        /// <param name="delta">插值的过渡时间参数</param>
+        private void HandleRotation(float delta)
         {
             // 初始化目标方向
-            Vector3 t_targetDir = Vector3.zero;
+            Vector3 targetDir = Vector3.zero;
             // 矢量加和结果
             float t_moveOverride = inputHandler.moveAmount;
             // 输入方向
-            t_targetDir += cameraObject.forward * inputHandler.vertical;
-            t_targetDir += cameraObject.right * inputHandler.horizontal;
+            targetDir += cameraObject.forward * inputHandler.vertical;
+            targetDir += cameraObject.right * inputHandler.horizontal;
             // 归一化，并将y轴矢量置为0
-            t_targetDir.Normalize();
-            t_targetDir.y = 0;
+            targetDir.Normalize();
+            targetDir.y = 0;
 
             // 如果没有位移，则将方向置为前方
-            if (t_targetDir == Vector3.zero) t_targetDir = myTransform.forward;
+            if (targetDir == Vector3.zero) targetDir = myTransform.forward;
 
-            float t_rs = rotationSpeed;
+            float rs = rotationSpeed;
             // 返回一个转向给定方向之后的角度
-            Quaternion t_tr = Quaternion.LookRotation(t_targetDir);
+            Quaternion tr = Quaternion.LookRotation(targetDir);
             // 从原始角度插值到给定角度
-            myTransform.rotation = Quaternion.Slerp(myTransform.rotation, t_tr, t_rs * p_delta);
+            myTransform.rotation = Quaternion.Slerp(myTransform.rotation, tr, rs * delta);
         }
 
         #endregion Movements

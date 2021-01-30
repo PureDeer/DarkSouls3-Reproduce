@@ -8,25 +8,28 @@ namespace BL767.DS3
     {
         #region Variables
 
-        [Tooltip("The camera will eventually go to")]
+        [Tooltip("相机跟随的对象，这里指角色")]
         public Transform targetTransform;
 
-        [Tooltip("The actual camera")]
+        [Tooltip("相机本身")]
         public Transform cameraTransform;
 
-        [Tooltip("The pivot transform that camera rotate around")]
+        [Tooltip("相机旋转所绕的轴")]
         public Transform cameraPivotTransform;
 
         private Transform myTransform;
         private Vector3 cameraTransformPos;
         private LayerMask ignoreLayers;
+        private Vector3 cameraFollowVelocity = Vector3.zero;
 
+        [HideInInspector]
         public static CameraHandler singleton;
 
         public float lookSpeed = 0.1f;
         public float followSpeed = 0.1f;
         public float pivotSpeed = 0.03f;
 
+        private float targetPos;
         private float defaultPos;
         private float lookAngle;
         private float pivotAngle;
@@ -57,7 +60,8 @@ namespace BL767.DS3
         public void FollowTarget(float delta)
         {
             // targetTransform相当于玩家，让相机跟随玩家
-            Vector3 targetPos = Vector3.Lerp(myTransform.position, targetTransform.position, delta / followSpeed);
+            Vector3 targetPos =
+                Vector3.SmoothDamp(myTransform.position, targetTransform.position, ref cameraFollowVelocity, delta / followSpeed);
             myTransform.position = targetPos;
         }
 
@@ -74,7 +78,7 @@ namespace BL767.DS3
             pivotAngle = Mathf.Clamp(pivotAngle, minPivot, maxPivot);
 
             Vector3 rotation = Vector3.zero;
-            // 当鼠标在x轴移动，变换成相机角度旋转则是绕着y轴转，而鼠标在x轴的移动输入则为绕着y轴转的度数
+            // 当鼠标在x轴移动，变换成相机角度旋转则是绕着y轴转，而鼠标在x轴的移动输入即为绕着y轴转的度数
             rotation.y = lookAngle;
             Quaternion targetRotation = Quaternion.Euler(rotation);
             myTransform.rotation = targetRotation;

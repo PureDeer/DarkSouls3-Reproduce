@@ -19,35 +19,35 @@ namespace BL767.DS3
             horizontal = Animator.StringToHash("Horizontal");
         }
 
-        public void UpdateAnimatorValues(float p_verticalMovement, float p_horizontaiMovement)
+        public void UpdateAnimatorValues(float verticalMovement, float horizontaiMovement)
         {
             #region Vertical
 
-            float t_v;
+            float v;
 
-            if (p_verticalMovement > 0 && p_verticalMovement < 0.55f) t_v = 0.5f;
-            else if (p_verticalMovement > 0.55f) t_v = 1;
-            else if (p_verticalMovement < 0 && p_verticalMovement > -0.55f) t_v = -0.5f;
-            else if (p_verticalMovement < -0.55f) t_v = -1;
-            else t_v = 0;
+            if (verticalMovement > 0 && verticalMovement < 0.55f) v = 0.5f;
+            else if (verticalMovement > 0.55f) v = 1;
+            else if (verticalMovement < 0 && verticalMovement > -0.55f) v = -0.5f;
+            else if (verticalMovement < -0.55f) v = -1;
+            else v = 0;
 
             #endregion Vertical
 
             #region Horizontal
 
-            float t_h;
+            float h;
 
-            if (p_horizontaiMovement > 0 && p_horizontaiMovement < 0.55f) t_h = 0.5f;
-            else if (p_horizontaiMovement > 0.55f) t_h = 1;
-            else if (p_horizontaiMovement < 0 && p_horizontaiMovement > -0.55f) t_h = -0.5f;
-            else if (p_horizontaiMovement < -0.55f) t_h = -1;
-            else t_h = 0;
+            if (horizontaiMovement > 0 && horizontaiMovement < 0.55f) h = 0.5f;
+            else if (horizontaiMovement > 0.55f) h = 1;
+            else if (horizontaiMovement < 0 && horizontaiMovement > -0.55f) h = -0.5f;
+            else if (horizontaiMovement < -0.55f) h = -1;
+            else h = 0;
 
             #endregion Horizontal
 
             // damp float, 动画过渡
-            anim.SetFloat(vertical, t_v, 0.1f, Time.deltaTime);
-            anim.SetFloat(horizontal, t_h, 0.1f, Time.deltaTime);
+            anim.SetFloat(vertical, v, 0.1f, Time.deltaTime);
+            anim.SetFloat(horizontal, h, 0.1f, Time.deltaTime);
         }
 
         public void CanRotate() => canRotate = true;
