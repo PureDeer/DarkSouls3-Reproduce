@@ -64,11 +64,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\ResetIsInteracting.cs" />
     <Compile Include="Assets\Scripts\AnimationHandler.cs" />
     <Compile Include="Assets\Scripts\CameraHandler.cs" />
     <Compile Include="Assets\Scripts\InputHandler.cs" />
     <Compile Include="Assets\Scripts\PlayerControls.cs" />
     <Compile Include="Assets\Scripts\PlayerLocomotion.cs" />
+    <Compile Include="Assets\Scripts\PlayerManager.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:/ProgramSoftware/Unity/2019.4.17f1c1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

@@ -27,7 +27,12 @@ namespace BL767.DS3
         private float movementSpeed = 5.0f;
 
         [SerializeField]
+        private float sprintSpeed = 7.0f;
+
+        [SerializeField]
         private float rotationSpeed = 10.0f;
+
+        public bool isSprinting;
 
         #endregion Variables
 
@@ -49,7 +54,21 @@ namespace BL767.DS3
         {
             float delta = Time.deltaTime;
             // 更新输入，包括鼠标，键盘
+            isSprinting = inputHandler.b_Input;
             inputHandler.TickInput(delta);
+            HandleMovement(delta);
+            HandleRollingAndSprinting(delta);
+        }
+
+        #endregion MonoBehaviour Callbacks
+
+        #region Movements
+
+        public void HandleMovement(float delta)
+        {
+            // 如果在交互中，不允许做其他动作
+            if (inputHandler.rollFlag) return;
+
             moveDirection = cameraObject.forward * inputHandler.vertical;
             moveDirection += cameraObject.right * inputHandler.horizontal;
             moveDirection.Normalize();
@@ -57,23 +76,59 @@ namespace BL767.DS3
             // 所以需要在这里将moveDirection的y轴矢量置为0
             moveDirection.y = 0;
 
-            // 将速度加入到move
-            float t_speed = movementSpeed;
-            moveDirection *= t_speed;
+            // 奔跑
+            if (inputHandler.sprintFlag)
+            {
+                movementSpeed = sprintSpeed;
+                isSprinting = true;
+                moveDirection *= movementSpeed;
+            }
+            else
+            {
+                // 将速度加入到move
+                moveDirection *= movementSpeed;
+            }
+
             // moveDirection会随着输入一直更新，所以会一直把moveDirection投射到plane上
             // 再将投射后的矢量赋给刚体的速度，即达成move
             Vector3 projectedVelocity = Vector3.ProjectOnPlane(moveDirection, normalVector);
             rigidbody.velocity = projectedVelocity;
 
-            animationHandler.UpdateAnimatorValues(inputHandler.moveAmount, 0);
+            animationHandler.UpdateAnimatorValues(inputHandler.moveAmount, 0, isSprinting);
 
             // 旋转
             if (animationHandler.canRotate) HandleRotation(delta);
         }
 
-        #endregion MonoBehaviour Callbacks
+        /// <summary>
+        /// 负责处理翻滚和奔跑。
+        /// </summary>
+        /// <param name="delta"></param>
+        public void HandleRollingAndSprinting(float delta)
+        {
+            if (animationHandler.anim.GetBool("isInteracting")) return;
 
-        #region Movements
+            // 如果有翻滚键输入
+            if (inputHandler.rollFlag)
+            {
+                moveDirection = cameraObject.forward * inputHandler.vertical;
+                moveDirection += cameraObject.right * inputHandler.horizontal;
+                // 如果有动作，执行Rolling
+                if (inputHandler.moveAmount > 0)
+                {
+                    // 播放指定动画，并把isInteracting设置为true
+                    animationHandler.PlaytargetAnimation("Rolling", true);
+                    moveDirection.y = 0;
+
+                    Quaternion rollRotation = Quaternion.LookRotation(moveDirection);
+                    myTransform.rotation = rollRotation;
+                }
+                else
+                {
+                    animationHandler.PlaytargetAnimation("Backstep", true);
+                }
+            }
+        }
 
         private Vector3 normalVector;
         private Vector3 targetPosition;

@@ -14,6 +14,12 @@ namespace BL767.DS3
         public float mouseX;
         public float mouseY;
 
+        public bool b_Input;
+        public bool rollFlag;
+        public bool sprintFlag;
+        public bool isInteracting;
+        public float rollInputTimer;
+
         private PlayerControls inputActions;
         private CameraHandler cameraHandler;
 
@@ -62,9 +68,10 @@ namespace BL767.DS3
 
         #region Public Methods
 
-        public void TickInput(float t_delta)
+        public void TickInput(float delta)
         {
-            MoveInput(t_delta);
+            MoveInput(delta);
+            HandleRollInput(delta);
         }
 
         #endregion Public Methods
@@ -75,7 +82,7 @@ namespace BL767.DS3
         /// 角色动作输入，包括键盘和鼠标
         /// </summary>
         /// <param name="delta"></param>
-        private void MoveInput(float t_delta)
+        private void MoveInput(float delta)
         {
             horizontal = movementInput.x;
             vertical = movementInput.y;
@@ -84,6 +91,32 @@ namespace BL767.DS3
 
             mouseX = cameraInput.x;
             mouseY = cameraInput.y;
+        }
+
+        /// <summary>
+        /// 负责角色前滚输入
+        /// </summary>
+        /// <param name="delta"></param>
+        private void HandleRollInput(float delta)
+        {
+            // 检测是否有按键输入
+            b_Input = inputActions.PlayerActions.Roll.phase == UnityEngine.InputSystem.InputActionPhase.Started;
+
+            if (b_Input)
+            {
+                rollInputTimer += delta;
+                sprintFlag = true;
+            }
+            else
+            {
+                if (rollInputTimer > 0 && rollInputTimer < 0.5f)
+                {
+                    sprintFlag = false;
+                    rollFlag = true;
+                }
+
+                rollInputTimer = 0;
+            }
         }
 
         #endregion Private Methods
