@@ -117,7 +117,7 @@ namespace BL767.DS3
                 if (inputHandler.moveAmount > 0)
                 {
                     // 播放指定动画，并把isInteracting设置为true
-                    animationHandler.PlaytargetAnimation("Rolling", true);
+                    animationHandler.PlayTargetAnimation("Rolling", true);
                     moveDirection.y = 0;
 
                     Quaternion rollRotation = Quaternion.LookRotation(moveDirection);
@@ -125,7 +125,7 @@ namespace BL767.DS3
                 }
                 else
                 {
-                    animationHandler.PlaytargetAnimation("Backstep", true);
+                    animationHandler.PlayTargetAnimation("Backstep", true);
                 }
             }
         }
@@ -142,7 +142,7 @@ namespace BL767.DS3
             // 初始化目标方向
             Vector3 targetDir = Vector3.zero;
             // 矢量加和结果
-            float t_moveOverride = inputHandler.moveAmount;
+            float moveOverride = inputHandler.moveAmount;
             // 输入方向
             targetDir += cameraObject.forward * inputHandler.vertical;
             targetDir += cameraObject.right * inputHandler.horizontal;

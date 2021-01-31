@@ -50,7 +50,7 @@ namespace BL767.DS3
             #endregion Horizontal
 
             // 奔跑，并且解决住原地后撤时会先显示跑步的动画的Bug
-            if (isSprinting && inputHandler.moveAmount > 0.001)
+            if (isSprinting && !Mathf.Approximately(inputHandler.moveAmount, 0))
             {
                 v = 2;
                 h = horizontaiMovement;
@@ -61,7 +61,7 @@ namespace BL767.DS3
             anim.SetFloat(horizontal, h, 0.1f, Time.deltaTime);
         }
 
-        public void PlaytargetAnimation(string targetAnim, bool isInteracting)
+        public void PlayTargetAnimation(string targetAnim, bool isInteracting)
         {
             anim.applyRootMotion = isInteracting;
             anim.SetBool("isInteracting", isInteracting);
