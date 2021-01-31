@@ -383,8 +383,10 @@ MonoBehaviour:
   animationHandler: {fileID: 0}
   rigidbody: {fileID: 614299050}
   normalCamera: {fileID: 0}
-  movementSpeed: 5
+  movementSpeed: 4
+  sprintSpeed: 7
   rotationSpeed: 10
+  isSprinting: 0
 --- !u!114 &614299053
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -404,7 +406,9 @@ MonoBehaviour:
   mouseY: 0
   b_Input: 0
   rollFlag: 0
+  sprintFlag: 0
   isInteracting: 0
+  rollInputTimer: 0
 --- !u!114 &614299054
 MonoBehaviour:
   m_ObjectHideFlags: 0

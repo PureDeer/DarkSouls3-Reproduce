@@ -24,7 +24,7 @@ namespace BL767.DS3
 
         [Header("Stats")]
         [SerializeField]
-        private float movementSpeed = 5.0f;
+        private float movementSpeed = 4.0f;
 
         [SerializeField]
         private float sprintSpeed = 7.0f;
@@ -76,12 +76,12 @@ namespace BL767.DS3
             // 所以需要在这里将moveDirection的y轴矢量置为0
             moveDirection.y = 0;
 
-            // 奔跑
+            // 奔跑，运动方向就乘以奔跑的长度
+            // 否则，乘以普通行走的长度
             if (inputHandler.sprintFlag)
             {
-                movementSpeed = sprintSpeed;
                 isSprinting = true;
-                moveDirection *= movementSpeed;
+                moveDirection *= sprintSpeed;
             }
             else
             {

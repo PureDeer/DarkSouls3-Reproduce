@@ -49,8 +49,8 @@ namespace BL767.DS3
 
             #endregion Horizontal
 
-            // 奔跑
-            if (isSprinting)
+            // 奔跑，并且解决住原地后撤时会先显示跑步的动画的Bug
+            if (isSprinting && inputHandler.moveAmount > 0.001)
             {
                 v = 2;
                 h = horizontaiMovement;
