@@ -1,26 +1,26 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace BL767.DS3
 {
     public class AnimationHandler : MonoBehaviour
     {
+        private PlayerManager _pm;
         public Animator anim;
-        public InputHandler inputHandler;
-        public PlayerLocomotion plm;
+        private InputHandler _inputHandler;
+        private PlayerLocomotion _plm;
         public bool canRotate;
 
-        private int vertical;
-        private int horizontal;
+        private int _vertical;
+        private int _horizontal;
 
         public void Initialize()
         {
+            _pm = GetComponentInParent<PlayerManager>();
             anim = GetComponent<Animator>();
-            plm = GetComponentInParent<PlayerLocomotion>();
-            inputHandler = GetComponentInParent<InputHandler>();
-            vertical = Animator.StringToHash("Vertical");
-            horizontal = Animator.StringToHash("Horizontal");
+            _plm = GetComponentInParent<PlayerLocomotion>();
+            _inputHandler = GetComponentInParent<InputHandler>();
+            _vertical = Animator.StringToHash("Vertical");
+            _horizontal = Animator.StringToHash("Horizontal");
         }
 
         public void UpdateAnimatorValues(float verticalMovement, float horizontaiMovement, bool isSprinting)
@@ -50,15 +50,15 @@ namespace BL767.DS3
             #endregion Horizontal
 
             // 奔跑，并且解决住原地后撤时会先显示跑步的动画的Bug
-            if (isSprinting && !Mathf.Approximately(inputHandler.moveAmount, 0))
+            if (isSprinting && !Mathf.Approximately(_inputHandler.moveAmount, 0))
             {
                 v = 2;
                 h = horizontaiMovement;
             }
 
             // damp float, 动画过渡
-            anim.SetFloat(vertical, v, 0.1f, Time.deltaTime);
-            anim.SetFloat(horizontal, h, 0.1f, Time.deltaTime);
+            anim.SetFloat(_vertical, v, 0.1f, Time.deltaTime);
+            anim.SetFloat(_horizontal, h, 0.1f, Time.deltaTime);
         }
 
         public void PlayTargetAnimation(string targetAnim, bool isInteracting)
@@ -75,14 +75,14 @@ namespace BL767.DS3
 
         private void OnAnimatorMove()
         {
-            if (!inputHandler.isInteracting) return;
+            if (!_pm.isInteracting) return;
 
-            float delta = Time.deltaTime;
-            plm.rigidbody.drag = 0;
-            Vector3 deltaPos = anim.deltaPosition;
+            var delta = Time.deltaTime;
+            _plm.rigidbody.drag = 0;
+            var deltaPos = anim.deltaPosition;
             deltaPos.y = 0;
-            Vector3 velocity = deltaPos / delta;
-            plm.rigidbody.velocity = velocity;
+            var velocity = deltaPos / delta;
+            _plm.rigidbody.velocity = velocity;
         }
     }
 }

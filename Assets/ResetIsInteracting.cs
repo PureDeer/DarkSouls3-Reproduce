@@ -1,12 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class ResetIsInteracting : StateMachineBehaviour
+namespace BL767.DS3
 {
-    override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    public class ResetIsInteracting : StateMachineBehaviour
     {
-        // 推出动画时，设isInteracting为False;
-        animator.SetBool("isInteracting", false);
+        public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+        {
+            // 推出动画时，设isInteracting为False;
+            animator.SetBool("isInteracting", false);
+        }
     }
 }

@@ -379,14 +379,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6327b1ca8d1cfc44a9654de46d468c7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _movementSpeed: 4
+  _sprintSpeed: 7
+  _rotationSpeed: 10
   myTransform: {fileID: 0}
   animationHandler: {fileID: 0}
   rigidbody: {fileID: 614299050}
   normalCamera: {fileID: 0}
-  movementSpeed: 4
-  sprintSpeed: 7
-  rotationSpeed: 10
-  isSprinting: 0
 --- !u!114 &614299053
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -404,10 +403,9 @@ MonoBehaviour:
   moveAmount: 0
   mouseX: 0
   mouseY: 0
-  b_Input: 0
+  bInput: 0
   rollFlag: 0
   sprintFlag: 0
-  isInteracting: 0
   rollInputTimer: 0
 --- !u!114 &614299054
 MonoBehaviour:
@@ -421,6 +419,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63acbffabe6f3cb4bb60eba49956d06b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isInteracting: 0
+  isSprinting: 0
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -666,9 +666,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d19398fdb5119964391e5a8c8b3633aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  anim: {fileID: 0}
-  inputHandler: {fileID: 0}
-  plm: {fileID: 0}
+  anim: {fileID: 872793723}
   canRotate: 1
 --- !u!95 &872793723
 Animator:

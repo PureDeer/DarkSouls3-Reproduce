@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace BL767.DS3
 {
@@ -17,10 +15,10 @@ namespace BL767.DS3
         [Tooltip("相机旋转所绕的轴")]
         public Transform cameraPivotTransform;
 
-        private Transform myTransform;
-        private Vector3 cameraTransformPos;
-        private LayerMask ignoreLayers;
-        private Vector3 cameraFollowVelocity = Vector3.zero;
+        private Transform _myTransform;
+        private Vector3 _cameraTransformPos;
+        private LayerMask _ignoreLayers;
+        private Vector3 _cameraFollowVelocity = Vector3.zero;
 
         [HideInInspector]
         public static CameraHandler singleton;
@@ -29,10 +27,10 @@ namespace BL767.DS3
         public float followSpeed = 0.1f;
         public float pivotSpeed = 0.03f;
 
-        private float targetPos;
-        private float defaultPos;
-        private float lookAngle;
-        private float pivotAngle;
+        private float _targetPos;
+        private float _defaultPos;
+        private float _lookAngle;
+        private float _pivotAngle;
 
         [Tooltip("相机向上可旋转的最大角度")]
         public float minPivot = -35;
@@ -54,11 +52,11 @@ namespace BL767.DS3
         {
             // using Singleton Design Pattern
             if (singleton == null) singleton = this;
-            myTransform = transform;
+            _myTransform = transform;
             // 实际上这个是相机离人物的水平距离
-            defaultPos = cameraTransform.localPosition.z;
+            _defaultPos = cameraTransform.localPosition.z;
             //
-            ignoreLayers = ~(1 << 8 | 1 << 9 | 1 << 10);
+            _ignoreLayers = ~(1 << 8 | 1 << 9 | 1 << 10);
         }
 
         #endregion MonoBehaviours Callbacks
@@ -68,12 +66,12 @@ namespace BL767.DS3
         public void FollowTarget(float delta)
         {
             // targetTransform相当于玩家，让相机跟随玩家
-            Vector3 targetPos = Vector3.SmoothDamp(
-                myTransform.position,
+            var targetPos = Vector3.SmoothDamp(
+                _myTransform.position,
                 targetTransform.position,
-                ref cameraFollowVelocity,
+                ref _cameraFollowVelocity,
                 delta / followSpeed);
-            myTransform.position = targetPos;
+            _myTransform.position = targetPos;
 
             HandleCameraCollision(delta);
         }
@@ -86,21 +84,23 @@ namespace BL767.DS3
         /// <param name="mouseYInput"></param>
         public void HandleCameraRotation(float delta, float mouseXInput, float mouseYInput)
         {
-            lookAngle += (mouseXInput * lookSpeed) / delta;
-            pivotAngle -= (mouseYInput * pivotSpeed) / delta;
-            pivotAngle = Mathf.Clamp(pivotAngle, minPivot, maxPivot);
+            _lookAngle += (mouseXInput * lookSpeed) / delta;
+            _pivotAngle -= (mouseYInput * pivotSpeed) / delta;
+            _pivotAngle = Mathf.Clamp(_pivotAngle, minPivot, maxPivot);
 
-            Vector3 rotation = Vector3.zero;
+            var rotation = Vector3.zero;
+            // 对摄像机旋转进行Lerp
             // 当鼠标在x轴移动，变换成相机角度旋转则是绕着y轴转，而鼠标在x轴的移动输入即为绕着y轴转的度数
-            rotation.y = lookAngle;
-            Quaternion targetRotation = Quaternion.Euler(rotation);
-            myTransform.rotation = targetRotation;
+            rotation.y = _lookAngle;
+            var targetRotation = Quaternion.Euler(rotation);
+            _myTransform.rotation = Quaternion.Lerp(_myTransform.rotation, targetRotation, delta * 10f);
 
             rotation = Vector3.zero;
-            rotation.x = pivotAngle;
+            rotation.x = _pivotAngle;
 
             targetRotation = Quaternion.Euler(rotation);
-            cameraPivotTransform.localRotation = targetRotation;
+            cameraPivotTransform.localRotation =
+                Quaternion.Lerp(cameraPivotTransform.localRotation, targetRotation, delta * 27f);
         }
 
         #endregion Public Methods
@@ -109,30 +109,30 @@ namespace BL767.DS3
 
         private void HandleCameraCollision(float delta)
         {
-            targetPos = defaultPos;
-            Vector3 dir = cameraTransform.position - cameraPivotTransform.position;
+            _targetPos = _defaultPos;
+            var dir = cameraTransform.position - cameraPivotTransform.position;
             dir.Normalize();
             // 射线检测
-            bool isDetected = Physics.SphereCast(cameraPivotTransform.position,
+            var isDetected = Physics.SphereCast(cameraPivotTransform.position,
                                                 cameraSphereRadius,
                                                 dir,
-                                                out RaycastHit hit,
-                                                Mathf.Abs(targetPos),
-                                                ignoreLayers);
+                                                out var hit,
+                                                Mathf.Abs(_targetPos),
+                                                _ignoreLayers);
             // 如果像机碰撞，那么相机离人物距离将减少
             if (isDetected)
             {
-                float distance = Vector3.Distance(cameraPivotTransform.position, hit.point);
-                targetPos = -(distance - cameraCollisionOffset);
+                var distance = Vector3.Distance(cameraPivotTransform.position, hit.point);
+                _targetPos = -(distance - cameraCollisionOffset);
             }
             // 碰撞达到最小允许拉近距离
-            if (Mathf.Abs(targetPos) < minimumCollisionOffset)
+            if (Mathf.Abs(_targetPos) < minimumCollisionOffset)
             {
-                targetPos = -minimumCollisionOffset;
+                _targetPos = -minimumCollisionOffset;
             }
             // 插值，让摄像机碰撞时更新距离
-            cameraTransformPos.z = Mathf.Lerp(cameraTransform.localPosition.z, targetPos, delta / 0.2f);
-            cameraTransform.localPosition = cameraTransformPos;
+            _cameraTransformPos.z = Mathf.Lerp(cameraTransform.localPosition.z, _targetPos, delta / 0.2f);
+            cameraTransform.localPosition = _cameraTransformPos;
         }
 
         #endregion Private Methods

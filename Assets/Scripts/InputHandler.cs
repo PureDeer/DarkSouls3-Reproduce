@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace BL767.DS3
 {
@@ -14,54 +12,37 @@ namespace BL767.DS3
         public float mouseX;
         public float mouseY;
 
-        public bool b_Input;
+        public bool bInput;
         public bool rollFlag;
         public bool sprintFlag;
-        public bool isInteracting;
+
         public float rollInputTimer;
 
-        private PlayerControls inputActions;
-        private CameraHandler cameraHandler;
+        private PlayerControls _inputActions;
 
-        private Vector2 movementInput;
-        private Vector2 cameraInput;
+        private Vector2 _movementInput;
+        private Vector2 _cameraInput;
 
         #endregion Variables
 
         #region MonoBehaviour Callbacks
 
-        private void Awake()
-        {
-            cameraHandler = CameraHandler.singleton;
-        }
-
         private void OnEnable()
         {
-            if (inputActions == null)
+            if (_inputActions == null)
             {
-                inputActions = new PlayerControls();
+                _inputActions = new PlayerControls();
                 // lambda表达式 添加事件。读取键盘输入和鼠标输入
-                inputActions.PlayerMovements.Movements.performed += inputActions => movementInput = inputActions.ReadValue<Vector2>();
-                inputActions.PlayerMovements.Camera.performed += inputActions => cameraInput = inputActions.ReadValue<Vector2>();
+                _inputActions.PlayerMovements.Movements.performed += inputActions => _movementInput = inputActions.ReadValue<Vector2>();
+                _inputActions.PlayerMovements.Camera.performed += inputActions => _cameraInput = inputActions.ReadValue<Vector2>();
             }
 
-            inputActions.Enable();
+            _inputActions.Enable();
         }
 
         private void OnDisable()
         {
-            inputActions.Disable();
-        }
-
-        private void FixedUpdate()
-        {
-            float delta = Time.fixedDeltaTime;
-
-            if (cameraHandler != null)
-            {
-                cameraHandler.FollowTarget(delta);
-                cameraHandler.HandleCameraRotation(delta, mouseX, mouseY);
-            }
+            _inputActions.Disable();
         }
 
         #endregion MonoBehaviour Callbacks
@@ -84,13 +65,13 @@ namespace BL767.DS3
         /// <param name="delta"></param>
         private void MoveInput(float delta)
         {
-            horizontal = movementInput.x;
-            vertical = movementInput.y;
+            horizontal = _movementInput.x;
+            vertical = _movementInput.y;
             // 向量加和
             moveAmount = Mathf.Clamp01(Mathf.Abs(horizontal) + Mathf.Abs(vertical));
 
-            mouseX = cameraInput.x;
-            mouseY = cameraInput.y;
+            mouseX = _cameraInput.x;
+            mouseY = _cameraInput.y;
         }
 
         /// <summary>
@@ -100,9 +81,9 @@ namespace BL767.DS3
         private void HandleRollInput(float delta)
         {
             // 检测是否有按键输入
-            b_Input = inputActions.PlayerActions.Roll.phase == UnityEngine.InputSystem.InputActionPhase.Started;
+            bInput = _inputActions.PlayerActions.Roll.phase == UnityEngine.InputSystem.InputActionPhase.Started;
 
-            if (b_Input)
+            if (bInput)
             {
                 rollInputTimer += delta;
                 sprintFlag = true;
